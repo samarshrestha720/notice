@@ -12,6 +12,8 @@ webdriver-manager = "^3.5.4"
 bs4 = "^0.0.1"
 requests = "^2.27.1"
 firebase-admin = "^5.2.0"
+Flask = "^2.1.2"
+pyshorteners = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 
