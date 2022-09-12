@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests, time
 from keep_alive import keep_alive
-import datetime as dt
 import pyshorteners
 import re
 import csv
