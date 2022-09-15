@@ -5,7 +5,6 @@ import pyshorteners
 import re
 import csv
 
-
 type_bitly = pyshorteners.Shortener(api_key='daa876e13a562bea8962a76e506a74bc3d4cb746') #bitly api key
 
 def wtofile(): #write to file function
@@ -14,7 +13,18 @@ def wtofile(): #write to file function
           writer = csv.writer(wfile)
           writer.writerow(rows)
           wfile.close()
-    
+
+def sendSms():  #send sms function
+  u_title=title.replace(" ","%")
+  msg=f"{u_title}:%{shortUrl[1]}"
+  with open('phone.csv', mode='r') as phFile:
+    phList = csv.reader(phFile)
+    for phno in phList:
+      send_url=f"http://api.ininepal.com/api/index?username=inisamarshrestha&password=nepal@123&message={msg}&destination={phno[0]}&sender=SMS"
+      print(send_url)
+      print(phno[0]+msg)
+  phFile.close()
+
 count=0
 keep_alive() #ping/call uptime robot 
 
@@ -28,6 +38,7 @@ while True:
   title = first.find('a').text.strip()
   link=first.find('a').get('href')
   hits=first.find_all('td')[2].text.strip()
+  
   
   with open('notices.csv', mode='r') as file:
     csvFile = csv.reader(file)
@@ -45,6 +56,8 @@ while True:
       shortUrl= re.split("^https://",type_bitly.bitly.short(url))
       print("The Shortened URL is: " + shortUrl[1])
       wtofile()
+      sendSms()  #send sms function
+      
     file.close()
     count+=1
     print("count: ",count)
