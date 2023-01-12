@@ -1,16 +1,16 @@
 from bs4 import BeautifulSoup
-import requests
+import requests, time
 from keep_alive import keep_alive
 import pyshorteners
 import re, csv
-import discord, os, asyncio,aiohttp
-from io import BytesIO
+import os, asyncio,aiohttp
+
 
 type_bitly = pyshorteners.Shortener(
     api_key='daa876e13a562bea8962a76e506a74bc3d4cb746')  #bitly api key
-token = 'EAAMDySMjW2MBAHscR2ifFDdeHLy6Vn1dNa53NHxL5zrcnVhcsyF5qX42ZBYWMAqHGzrhpSPHyeS6YlmflRYaJyZCL5aY4U2IYz1887MuqXwh4qJyKsyeWfFSm7fEd4cg8L1CkQaOsaZBb8a3nOwdEIjxROmnc9Jd9TgAOKZAM9wFVJYEitWgex7wtTPd3RAZD'
+fbToken = 'EAAMDySMjW2MBAHscR2ifFDdeHLy6Vn1dNa53NHxL5zrcnVhcsyF5qX42ZBYWMAqHGzrhpSPHyeS6YlmflRYaJyZCL5aY4U2IYz1887MuqXwh4qJyKsyeWfFSm7fEd4cg8L1CkQaOsaZBb8a3nOwdEIjxROmnc9Jd9TgAOKZAM9wFVJYEitWgex7wtTPd3RAZD'
 
-client = discord.Client(intents=discord.Intents.default())
+
 
 #thread = threading.Thread(target=disRun)
 
@@ -39,7 +39,7 @@ def sendSms(title, shortUrl):  #send sms function
 
 def sendPost():
     msg = f"NEC New Notice:\n{title}\n{url}\n-NotifyNotice"
-    send_fb = f"https://graph.facebook.com/101231042826318/feed?message={msg}&access_token={token}"
+    send_fb = f"https://graph.facebook.com/101231042826318/feed?message={msg}&access_token={fbToken}"
     response_fb = requests.post(send_fb)
     print(response_fb.text)
 
@@ -52,16 +52,13 @@ def getImg(url):
   imgUrl = postContent.find('img').get('src')
   return imgUrl
 
+
 keep_alive()  #ping/call uptime robot
+count = 0
 
 
-@client.event
-async def on_ready():
-    await client.wait_until_ready()
-    channel = client.get_channel(int(os.environ['channel_id']))
-    print(f"Logged in as {client.user}")
-    count = 0
-    while True:
+  
+while True:
         data = requests.get(
             "http://nec.edu.np/index.php?option=com_content&view=category&id=47&Itemid=74",
             verify=False)
@@ -85,30 +82,18 @@ async def on_ready():
                 url = "http://nec.edu.np" + link
                 print("Link: " + url)
                 shortUrl = re.split("^https://", type_bitly.bitly.short(url))
-                imgUrl = "http://nec.edu.np" + getImg(url)  #get img url
+                #imgUrl = "http://nec.edu.np" + getImg(url)  #get img url
                 print("The Shortened URL is: " + shortUrl[1])
                 wtofile(title, url, shortUrl[1])
-                sendSms(title, shortUrl[1])  #send sms function
+                #sendSms(title, shortUrl[1])  #send sms function
                 #sendPost()  #post on page
                                 
-                async with aiohttp.ClientSession() as session:  # creates session
-                    async with session.get(imgUrl,verify_ssl=False) as resp:  # gets image from url
-                        img = await resp.read()  # reads image from response
-                        with BytesIO(img) as file:  # converts to file-like object
-                          await channel.send(
-                    f"**_NEC_ New Notice:**\n{title}\n{url}\n-NotifyNotice",file=discord.File(file, "testimage.png"))
-                          
-
             file.close()
             count = count + 1
             print("count: ", count)
-            await asyncio.sleep(60)
+            time.sleep(60)
+   
 
-
-try:
-  client.run(os.environ['disToken'])
-except:
-  os.system("kill 1")
 
 # print("Title: ", title)
 # print("Link: http://nec.edu.np"+link)
